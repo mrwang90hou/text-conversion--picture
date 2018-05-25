@@ -2,7 +2,8 @@ use [Index_TradeMark_wn]
 --查询所有的特殊字符串
   SELECT [id]
       ,[words]
-      ,[ChineseSpell],PATINDEX('%[^a-z]%',rtrim([ChineseSpell]))
+      ,[ChineseSpell]
+	  ,PATINDEX('%[^a-z]%',rtrim([ChineseSpell]))
       ,[FirstSpell]
 	  ,pic_exist
   FROM [Chinese_words]
@@ -11,7 +12,8 @@ use [Index_TradeMark_wn]
 
 
 SELECT [id]
-      ,[words],PATINDEX('%[^吖-座]%',rtrim([ChineseSpell]))
+      ,[words]
+	  ,PATINDEX('%[^吖-座]%',rtrim([ChineseSpell]))
       ,[ChineseSpell]
       ,[FirstSpell]
   FROM [Chinese_words]
