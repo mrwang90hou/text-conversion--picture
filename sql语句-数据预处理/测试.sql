@@ -92,3 +92,122 @@ drop table BG_gongGao2
 --  select @newDatas
 --  SET @MyCounter = @MyCounter + 1
 --END
+
+
+/*********************************************************自定义function函数学习***************************************************************************/
+--提取字符串中的不同类型字符
+ 
+use PracticeDB
+go
+create   function   fun_getCN(@str   nvarchar(4000))   
+  returns   nvarchar(4000)   
+  as   
+  begin   
+  declare   @word   nchar(1),@CN   nvarchar(4000)   
+  set   @CN=''   
+  while   len(@str)>0   
+  begin   
+  set   @word=left(@str,1)   
+  if unicode(@word)   between   19968   and   19968+20901 
+      set   @CN=@CN+@word
+  set   @str=right(@str,len(@str)-1)   
+  end   
+  return   @CN   
+  end   
+ 
+select dbo.fun_getCN('ASDKG论坛KDL')
+--论坛
+select dbo.fun_getCN('ASDKG論壇KDL')
+--論壇
+select dbo.fun_getCN('ASDKDL')
+--空字符串
+ 
+ 
+ 
+--提取数字
+IF OBJECT_ID('DBO.GET_NUMBER2') IS NOT NULL
+DROP FUNCTION DBO.GET_NUMBER2
+GO
+CREATE FUNCTION DBO.GET_NUMBER2(@S VARCHAR(100))
+RETURNS VARCHAR(100)
+AS
+BEGIN
+WHILE PATINDEX('%[^0-9]%',@S) > 0
+BEGIN
+set @s=stuff(@s,patindex('%[^0-9]%',@s),1,'')
+END
+RETURN @S
+END
+GO
+--测试
+PRINT DBO.GET_NUMBER('呵呵ABC123ABC')
+GO
+--123
+--------------------------------------------------------------------
+--提取英文
+IF OBJECT_ID('DBO.GET_STR') IS NOT NULL
+DROP FUNCTION DBO.GET_STR
+GO
+CREATE FUNCTION DBO.GET_STR(@S VARCHAR(100))
+RETURNS VARCHAR(100)
+AS
+BEGIN
+WHILE PATINDEX('%[^a-z]%',@S) > 0
+BEGIN
+set @s=stuff(@s,patindex('%[^a-z]%',@s),1,'')
+END
+RETURN @S
+END
+GO
+--测试
+PRINT DBO.GET_STR('呵呵ABC123ABC')
+GO
+--------------------------------------------------------------------
+--提取中文
+IF OBJECT_ID('DBO.CHINA_STR') IS NOT NULL
+DROP FUNCTION DBO.CHINA_STR
+GO
+CREATE FUNCTION DBO.CHINA_STR(@S NVARCHAR(100))
+RETURNS VARCHAR(100)
+AS
+BEGIN
+WHILE PATINDEX('%[^吖-座]%',@S) > 0
+SET @S = STUFF(@S,PATINDEX('%[^吖-座]%',@S),1,N'')
+RETURN @S
+END
+GO
+PRINT DBO.CHINA_STR('呵呵ABC123ABC')
+GO
+
+--
+/*
+				《SQL Server查询中特殊字符的处理方法》
+			https://www.cnblogs.com/shiyh/p/6971250.html
+SQL Server查询中，经常会遇到一些特殊字符，比如单引号“'”等，这些字符的处理方法，是SQL Server用户都应该需要知道的。
+
+我们都知道SQL Server查询过程中，单引号“'”是特殊字符，所以在SQL Server查询的时候要转换成双单引号“''”。
+但这只是特殊字符的一个，在实际项目中，发现对于like操作还有以下特殊字符：下划线“_”，百分号“%”，方括号“[]”以及尖号“^”。
+其用途如下：
+下划线：用于代替一个任意字符（相当于正则表达式中的 ? ）
+百分号：用于代替任意数目的任意字符（相当于正则表达式中的 * ）
+方括号：用于转义（事实上只有左方括号用于转义，右方括号使用最近优先原则匹配最近的左方括号）
+尖号：用于排除一些字符进行匹配（这个与正则表达式中的一样）
+
+以下是一些匹配的举例，需要说明的是，只有like操作才有这些特殊字符，=操作是没有的。
+a_b...        a[_]b%
+a%b...       a[%]b%
+a[b...       a[[]b%
+a]b...       a]b%
+a[]b...      a[[]]b%
+a[^]b...     a[[][^]]b%
+a[^^]b...    a[[][^][^]]b%
+
+在实际进行处理的时候，对于=操作，我们一般只需要如此替换：
+' -> ''
+对于like操作，需要进行以下替换（注意顺序也很重要）
+[ -> [[]     (这个必须是第一个替换的!!)
+% -> [%]    (这里%是指希望匹配的字符本身包括的%而不是专门用于匹配的通配符)
+_ -> [_]
+^ -> [^]
+
+*/

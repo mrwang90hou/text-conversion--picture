@@ -11,11 +11,22 @@ use [Index_TradeMark_wn]
  order by cast(id as int)
 
 
+--SELECT [id]
+--      ,[words]
+--	  ,PATINDEX('%[^ß¹-×ù]%',rtrim([ChineseSpell]))
+--      ,[ChineseSpell]
+--      ,[FirstSpell]
+--  FROM [Chinese_words]
+--  where PATINDEX('%[^ß¹-×ù]%',rtrim([words]))!=0 and pic_exist is null
+-- order by cast(id as int)
 SELECT [id]
       ,[words]
-	  ,PATINDEX('%[^ß¹-×ù]%',rtrim([ChineseSpell]))
+	  ,PATINDEX('%[a-z]%',rtrim([words]))
       ,[ChineseSpell]
       ,[FirstSpell]
+	  ,pic_exist
   FROM [Chinese_words]
-  where PATINDEX('%[^ß¹-×ù]%',rtrim([words]))!=0 and pic_exist is null
+  where PATINDEX('%[a-z]%',rtrim([words]))!=0 and pic_exist is null
  order by cast(id as int)
+
+
