@@ -7,7 +7,7 @@ use mrwang90hou
 --set pic_exist = replace(BGappPerson,substring(BGappPerson,2,2),'')
 
 
---update BG_gongGao set pic_exist = 0.11 where BGappPerson like '%(%' and  BGappPerson like '%)%'
+update BG_gongGao set pic_exist = 0.11 where BGappPerson like '%(%' and  BGappPerson like '%)%'
 --reverse(substring(reverse(words) ,charindex('(',reverse(words)) + 1 , len(words)))
 --select * from BG_gongGao where BGappPerson like '%(%' and  BGappPerson like '%)%'
 --select * from BG_gongGao where pic_exist = 0.11
