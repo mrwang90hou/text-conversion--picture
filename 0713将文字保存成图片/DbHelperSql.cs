@@ -4,9 +4,8 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
-using 国方商标历史公共处理程序;
 
-namespace 变更公告处理程序BianGeng
+namespace _0713将文字保存成图片
 {
     /// <summary>
     /// 数据访问基础类(基于SQLServer)
