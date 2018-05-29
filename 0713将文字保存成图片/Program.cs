@@ -55,7 +55,7 @@ namespace _0713将文字保存成图片
                     //    //MessageBox.Show(un.Length.ToString());
                     //}
 
-                    ct.CreateImage(un, ft);  //生成图片
+                    //ct.CreateImage(un, ft);  //生成图片
                     ct.saveToSQL(un, ft, ct.CreateImage(un, ft));  //将image图片存入数据库
 
                     Console.WriteLine("保存{0}成功！", un);
