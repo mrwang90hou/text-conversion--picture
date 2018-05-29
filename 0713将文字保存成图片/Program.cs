@@ -75,18 +75,21 @@ namespace _0713将文字保存成图片
         {
             //try
             //{
-                //string connString = "Data Source = . ;Initial Catalog =hotel;User ID=sa;Pwd=123456";//数据库连接字符串
-                //SqlConnection connection = new SqlConnection(connString);//创建connection对象
-                SqlConnection connection = new SqlConnection("Data Source=(local);Initial Catalog=MySchool;Integrated Security=SSPI;");
+            //string connString = "Data Source = . ;Initial Catalog =hotel;User ID=sa;Pwd=123456";//数据库连接字符串
+            //SqlConnection connection = new SqlConnection(connString);//创建connection对象
+            //SqlConnection connection = new SqlConnection("Data Source=(local);Initial Catalog=MySchool;Integrated Security=SSPI;");
+            SqlConnection connection = new SqlConnection("server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=MySchool");
 
-                string sql = "insert into Images (words,words_image,fonts) values (@words,@words_image,@fonts)";
+            //string connectionString = "server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=index_trademark_wn";
+            string sql = "insert into MySchool.dbo.Images(words,words_image,fonts) values (@words,@words_image,@fonts)";
 
-                Console.WriteLine("准备执行！");
-                //conn.Open();//打开数据库  
-                //打开数据库连接
-                connection.Open();
-                //创建数据库命令  
-                SqlCommand command = new SqlCommand(sql, connection);
+            //Console.WriteLine("存储数据准备执行！");
+            MessageBox.Show("存储数据准备执行！");
+            //conn.Open();//打开数据库  
+            //打开数据库连接
+            connection.Open();
+            //创建数据库命令  
+            SqlCommand command = new SqlCommand(sql, connection);
 
             /*********************************Bitmap => byte[]***********************************/
             //Bitmap image = new Bitmap("test.bmp ");
@@ -106,29 +109,30 @@ namespace _0713将文字保存成图片
 
             byte[] mybyte = PhotoImageInsert(image);
 
-                MessageBox.Show(content + "\n" + ft + "\n" + mybyte);
-                /*********************************Bitmap => byte[]***********************************/
-                /*
-                //图片路径
-                string picturePath = @"D:\222\黯沮(黑体).jpg"; //注意，这里需要指定保存图片的绝对路径和图片?
+            MessageBox.Show(content + "\n" + ft + "\n" + mybyte);
+            /*********************************Bitmap => byte[]***********************************/
+            /*
+            //图片路径
+            string picturePath = @"D:\222\黯沮(黑体).jpg"; //注意，这里需要指定保存图片的绝对路径和图片?
 
-                //文件的名称，每次必须更换图片的名称，这里很为不便
-                //创建FileStream对象
-                FileStream fs = new FileStream(picturePath, FileMode.Open, FileAccess.Read);
-                //声明Byte数组
-                Byte[] mybyte = new byte[fs.Length];
-                //读取数据
-                fs.Read(mybyte, 0, mybyte.Length);
-                fs.Close();
-                */
-                //转换成二进制数据，并保存到数据库
-                SqlParameter prm1 = new SqlParameter("@words", SqlDbType.VarBinary, mybyte.Length, ParameterDirection.Input, false, 0, 0, null, DataRowVersion.Current, content);
-                SqlParameter prm2 = new SqlParameter("@words_image", SqlDbType.VarBinary, mybyte.Length, ParameterDirection.Input, false, 0, 0, null, DataRowVersion.Current, mybyte);
-                SqlParameter prm3 = new SqlParameter("@fonts", SqlDbType.VarBinary, mybyte.Length, ParameterDirection.Input, false, 0, 0, null, DataRowVersion.Current, ft);
+            //文件的名称，每次必须更换图片的名称，这里很为不便
+            //创建FileStream对象
+            FileStream fs = new FileStream(picturePath, FileMode.Open, FileAccess.Read);
+            //声明Byte数组
+            Byte[] mybyte = new byte[fs.Length];
+            //读取数据
+            fs.Read(mybyte, 0, mybyte.Length);
+            fs.Close();
+            */
+            //转换成二进制数据，并保存到数据库
+            SqlParameter[] prm =
+            {
+                    new SqlParameter("@words", SqlDbType.VarBinary, mybyte.Length, ParameterDirection.Input, false, 0, 0, null, DataRowVersion.Current, content),
+                    new SqlParameter("@words_image", SqlDbType.VarBinary, mybyte.Length, ParameterDirection.Input, false, 0, 0, null, DataRowVersion.Current, mybyte),
+                    new SqlParameter("@fonts", SqlDbType.VarBinary, mybyte.Length, ParameterDirection.Input, false, 0, 0, null, DataRowVersion.Current, ft)
+            };
 
-                command.Parameters.Add(prm1);
-                command.Parameters.Add(prm1);
-                command.Parameters.Add(prm1);
+                command.Parameters.Add(prm);
                 command.ExecuteNonQuery();
                 connection.Close();
                 Console.WriteLine("执行完毕！");
@@ -147,14 +151,23 @@ namespace _0713将文字保存成图片
         /// <returns>二进制</returns>
         public static byte[] PhotoImageInsert(System.Drawing.Bitmap imgPhoto)
         {
-            //将Image转换成流数据，并保存为byte[]
-            MemoryStream mstream = new MemoryStream();
-            imgPhoto.Save(mstream, System.Drawing.Imaging.ImageFormat.Jpeg);
-            byte[] byData = new Byte[mstream.Length];
-            mstream.Position = 0;
-            mstream.Read(byData, 0, byData.Length);
-            mstream.Close();
-            return byData;
+            try
+            {
+                //将Image转换成流数据，并保存为byte[]
+                MemoryStream mstream = new MemoryStream();
+                imgPhoto.Save(mstream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                byte[] byData = new Byte[mstream.Length];
+                mstream.Position = 0;
+                mstream.Read(byData, 0, byData.Length);
+                mstream.Close();
+                return byData;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message.ToString());
+                //throw e;
+                return null;
+            }
         }
 
         private Bitmap CreateImage(string content,string ft)
