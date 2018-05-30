@@ -13,6 +13,14 @@ namespace _0713将文字保存成图片
 {
     class Program
     {
+        public static int temp1 = 0;
+        public static int temp2 = 0;
+        public static int temp3 = 0;
+        public static string buildPicturePath = @"H:\国方软件\中英字词转图片\图片数据测试文件\生成图片\";
+        public static string loadPicturePath = @"H:\国方软件\中英字词转图片\图片数据测试文件\导出图片\";
+
+
+
         static void Main(string[] args)
         {
             //Form1 f1 = new Form1();
@@ -26,9 +34,10 @@ namespace _0713将文字保存成图片
             conn.Open();//打开数据库  
             //创建数据库命令  
             SqlCommand cmd = conn.CreateCommand();
-            //创建查询语句  
+            //创建查询语句
             //cmd.CommandText = "SELECT distinct un_simplified FROM Chinese_Img where id=22";
-            cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id >= 3535 and id <= 3540";//希腊字母
+            //cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id >= 3535 and id <= 3540";//希腊字母
+            cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id <= 2";//希腊字母
             //cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id =103220";//【横眉冷对千夫指  俯首甘为孺子牛】
             //从数据库中读取数据流存入reader中
             SqlDataReader reader = cmd.ExecuteReader();
@@ -38,9 +47,6 @@ namespace _0713将文字保存成图片
             {
                 //string un = reader.GetString(reader.GetOrdinal("un_simplified")).Trim();
                 string un = reader.GetString(reader.GetOrdinal("words")).Trim();
-                
-
-
                 for (int i = 1; i <= 2; i++)
                 {
                     switch (i)
@@ -57,15 +63,18 @@ namespace _0713将文字保存成图片
 
                     //ct.CreateImage(un, ft);  //生成图片
                     ct.saveToSQL(un, ft, ct.CreateImage(un, ft));  //将image图片存入数据库
-
-                    Console.WriteLine("保存{0}成功！", un);
+                    temp2++;
+                    Console.WriteLine("{0}\t保存【{1}】成功！", temp2,un);
+                    //Console.WriteLine("保存{0}成功！", un);
                 }
             }
             conn.Close();
-            Console.WriteLine("执行完毕！");
+            Console.WriteLine("存库执行完毕！\n共计存储图片:{0}", temp2);
             //
-            ct.printPictureFormSQL();
+            ct.printPictureFromSQL();
+            Console.WriteLine("导出图片执行完毕！\n共计导出图片:{0}", temp3);
         }
+        
         /// <summary>
         /// 将image图片存入数据库
         /// </summary>
@@ -74,6 +83,8 @@ namespace _0713将文字保存成图片
         private void saveToSQL(string content, string ft, Bitmap image)
         {
             int sum_a = 0;
+
+#region 调试遗弃程序
             //    //try
             //    //{
             //    //string connString = "Data Source = . ;Initial Catalog =hotel;User ID=sa;Pwd=123456";//数据库连接字符串
@@ -146,19 +157,20 @@ namespace _0713将文字保存成图片
             //    //    //MessageBox.Show(ex.Message);
             //    //}
 
+            #endregion
             try
             {
                 byte[] mybyte = PhotoImageInsert(image, content,ft);
 
                 //MessageBox.Show(content + "\n" + ft + "\n" + mybyte);
-                string sqlCommandText1 = "insert into MySchool.dbo.Images(words,words_image,fonts) values (@words,@words_image,@fonts)";
+                string sqlCommandText1 = "insert into MySchool.dbo.Images(id,words,words_image,fonts) values (@id,@words,@words_image,@fonts)";
                 SqlParameter[] cmdParms1 =
                 {
+                        new SqlParameter("@id",++temp1),
                         new SqlParameter("@words",content),
                         new SqlParameter("@words_image",mybyte),
                         new SqlParameter("@fonts",ft)
                 };
-            
                 sum_a = sum_a + DbHelperSQL.ExecuteSql(sqlCommandText1, cmdParms1);
             }
             catch (Exception el)
@@ -168,68 +180,31 @@ namespace _0713将文字保存成图片
                 //Form1.text_Path02.Focus();
             }
         }
+
         /// <summary>
-        /// 图片转二进制
+        /// 图片转二进制【以及   图片存本地】
         /// </summary>
         /// <param name="imgPhoto">图片对象</param>
         /// <returns>二进制</returns>
-        public static byte[] PhotoImageInsert(System.Drawing.Bitmap imgPhoto, string content, string ft)
-        {
-            try
-            {
-                string path = @"D:\444\" + content.Replace(@"\", "") + "(" + ft + ")" + ".jpg";
-
-                FileStream fs = new FileStream(path, System.IO.FileMode.Open);
-
-                byte[] imgData = new byte[fs.Length];
-
-                fs.Read(imgData, 0, (int)fs.Length);
-
-                //MemoryStream ms = new MemoryStream(imgData);
-
-                //Image img = Image.FromStream(ms);
-
-                //img.Save("bb.jpg");
-                fs.Close();
-                return imgData;
-                
-                ////将Image转换成流数据，并保存为byte[]
-                //MemoryStream mstream = new MemoryStream(32);
-                //imgPhoto.Save(mstream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                //byte[] byData = new Byte[mstream.Length];
-                ////mstream.Position = 0;
-                //mstream.Seek(0, SeekOrigin.Begin);
-                //mstream.Read(byData, 0, byData.Length);
-                //mstream.Close();
-                ////mstream.Dispose();
-                //return byData;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("PhotoImageInsert" + e.Message.ToString());
-                //throw e;
-                return null;
-            }
-        }
-
-        private Bitmap CreateImage(string content,string ft)
+        private Bitmap CreateImage(string content, string ft)
         {
             //判断字符串不等于空和null
-            if (content == null || content.Trim() == String.Empty) {
+            if (content == null || content.Trim() == String.Empty)
+            {
                 MessageBox.Show("content == null || content.Trim() == String.Empty");
                 return null;
             }
             //string ch = ToGB2312(content);
             string ch = content;
-            
+
             //对字符串内容长度进行判断
             //Console.WriteLine("字符串内容长度为：{0}", content.Length);
-            
+
             int len = content.Length;
-            
+
 
             //创建一个位图对象
-            Bitmap image = new Bitmap(100*len, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);//(int)Math.Ceiling((content.Length * 550.0))
+            Bitmap image = new Bitmap(100 * len, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);//(int)Math.Ceiling((content.Length * 550.0))
 
             //设置dpi
             //image.SetResolution(300,300);
@@ -246,7 +221,7 @@ namespace _0713将文字保存成图片
             //g.CompositingQuality = CompositingQuality.HighQuality; 
 
             try
-            { 
+            {
                 //清空图片背景颜色
                 g.Clear(Color.White);
                 Font font = new Font(ft, 73, FontStyle.Regular);
@@ -254,9 +229,9 @@ namespace _0713将文字保存成图片
 
                 //设置保存路径
                 //MessageBox.Show("设置保存路径");
-                image.Save(@"D:\444\"+content.Replace(@"\","") + "(" + ft + ")" + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+                image.Save(buildPicturePath + content.Replace(@"\", "") + "(" + ft + ")" + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
             }
-            catch(System.ArgumentException ex)
+            catch (System.ArgumentException ex)
             {
                 MessageBox.Show("CreateImage" + ex.Message.ToString());
                 return null;
@@ -270,6 +245,38 @@ namespace _0713将文字保存成图片
             return image;
         }
 
+        /// <summary>
+        /// 从本地获取图片存库
+        /// </summary>
+        /// <param name="imgPhoto">图片对象</param>
+        /// <returns>二进制</returns>
+        public static byte[] PhotoImageInsert(System.Drawing.Bitmap imgPhoto, string content, string ft)
+        {
+            try
+            {
+                string path = buildPicturePath + content.Replace(@"\", "") + "(" + ft + ")" + ".jpg";
+
+                FileStream fs = new FileStream(path, System.IO.FileMode.Open);
+
+                byte[] imgData = new byte[fs.Length];
+
+                fs.Read(imgData, 0, (int)fs.Length);
+
+                //MemoryStream ms = new MemoryStream(imgData);
+
+                //Image img = Image.FromStream(ms);
+
+                //img.Save("bb.jpg");
+                fs.Close();
+                return imgData;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("PhotoImageInsert" + e.Message.ToString());
+                //throw e;
+                return null;
+            }
+        }
         /// <summary>
         /// 将Unicode编码转换为汉字字符串
         /// </summary>
@@ -316,46 +323,60 @@ namespace _0713将文字保存成图片
         //    pictureWindow.ShowDialog();
         //}
 
-
-        private void printPictureFormSQL()
-        {
-            string ft = "";
-            string connectionString = "server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=MySchool";//server处可以为localhost（本机的MySQL），//可以为云主机，那么等于号后为ip.Database为你的数据库名称
-            //SqlConnection conn = new SqlConnection("Data Source=(192.168.0.232);Initial Catalog=index_trademark;Integrated Security=SSPI;");
-            SqlConnection conn = new SqlConnection(connectionString);
-            conn.Open();//打开数据库  
-            //创建数据库命令  
-            SqlCommand cmd = conn.CreateCommand();
-            //创建查询语句  
-            cmd.CommandText = "SELECT words_image FROM Images where 1=1";
-            //从数据库中读取数据流存入reader中
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            //从reader中读取下一行数据,如果没有数据,reader.Read()返回flase  
-            while (reader.Read())
-            {
-                //string un = reader.GetString(reader.GetOrdinal("un_simplified")).Trim();
-                string un = reader.GetString(reader.GetOrdinal("words_image")).Trim();
-
-                MessageBox.Show(un);
-                //for (int i = 1; i <= 2; i++)
-                //{
-                //    switch (i)
-                //    {
-                //        case 1: ft = "黑体"; break;
-                //        case 2: ft = "宋体"; break;
-                //    }
-                //    //ByteArrayToImage(un);
-                //}
-            }
-            conn.Close();
-            Console.WriteLine("执行完毕！");
-        }
         public Image ByteArrayToImage(byte[] b)
         {
             MemoryStream ms = new MemoryStream(b);
             Image img = Image.FromStream(ms);
             return img;
+        }
+
+        /// <summary>
+        /// 从SQL中获取图片存入本地
+        /// </summary>
+        /// <param name="imgPhoto">图片对象</param>
+        /// <returns>二进制</returns>
+        public void printPictureFromSQL()
+        {
+            string ft = "";
+            string content = "";
+            byte[] MyData = new byte[0];
+            string sqlconnstr = "server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=MySchool";
+            using (SqlConnection conn = new SqlConnection(sqlconnstr))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+                //cmd.CommandText = "select * from T_img";
+                cmd.CommandText = "SELECT * FROM Images where 1 = 1";
+                SqlDataReader sdr = cmd.ExecuteReader();
+                while(sdr.Read())
+                {
+                    MyData = (byte[])sdr["words_image"];
+                    content = (string)sdr["words"];
+                    MemoryStream ms = new MemoryStream(MyData);
+                    Image newImage = Image.FromStream(ms);
+                   
+                        switch (++temp3%2)
+                        {
+                            case 1: ft = "黑体"; break;
+                            case 0: ft = "宋体"; break;
+                        }
+                        string path = loadPicturePath + content.Replace(@"\", "") + "(" + ft + ")" + ".jpg";
+                        //string 
+                        newImage.Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        //temp3++;
+                        Console.WriteLine("{0}\t输出【{1}】成功！", temp3, (content.Replace(@"\", "") + "(" + ft + ")" + ".jpg"));
+                }
+                //sdr.Read();
+                //MyData = (byte[])sdr["ImgFile"];//读取第一个图片的位流  
+                //int ArraySize = MyData.GetUpperBound(0);//获得数据库中存储的位流数组的维度上限，用作读取流的上限  
+
+                //FileStream fs = new FileStream(@"D:\00.jpg", FileMode.OpenOrCreate, FileAccess.Write);
+                //fs.Write(MyData, 0, ArraySize);
+                //fs.Close();   //-- 写入到c:\00.jpg。  
+                //conn.Close();
+                //Console.WriteLine("读取成功");//查看硬盘上的文件  
+            }
         }
     }
 }
