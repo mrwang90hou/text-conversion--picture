@@ -16,8 +16,9 @@ namespace _0713将文字保存成图片
         //<add key="ConnectionString" value="server=127.0.0.1;database=DATABASE;uid=sa;pwd=" />  
         //protected static string connectionString = ConfigurationSettings.AppSettings["ConnectionString"];
 
-        protected static string connectionString = Form1.connStr;
+        //protected static string connectionString = Form1.connStr;
         //protected static string connectionString = "server=(local);database=new_TempWork;uid=sa;pwd=wangning1995";
+        public static string connectionString = "server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=MySchool";
 
         //public DbHelperSQL()
         //{
@@ -131,7 +132,7 @@ namespace _0713将文字保存成图片
         /// <returns>影响的记录数</returns>
         public static int ExecuteSql(string SQLString, string content)
         {
-            connectionString = Form1.connStr;
+            //connectionString = connectionString;
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 SqlCommand cmd = new SqlCommand(SQLString, connection);
@@ -274,7 +275,7 @@ namespace _0713将文字保存成图片
         /// <returns>影响的记录数</returns>
         public static int ExecuteSql(string SQLString, params SqlParameter[] cmdParms)  //执行SQL语句
         {
-            connectionString = Form1.connStr;
+            //connectionString = Form1.connStr;
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand cmd = new SqlCommand())
