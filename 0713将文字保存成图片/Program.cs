@@ -37,7 +37,7 @@ namespace _0713将文字保存成图片
             //创建查询语句
             //cmd.CommandText = "SELECT distinct un_simplified FROM Chinese_Img where id=22";
             //cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id >= 3535 and id <= 3540";//希腊字母
-            cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id <= 2";//希腊字母
+            cmd.CommandText = "SELECT distinct words FROM Chinese_words_new";//希腊字母
             //cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id =103220";//【横眉冷对千夫指  俯首甘为孺子牛】
             //从数据库中读取数据流存入reader中
             SqlDataReader reader = cmd.ExecuteReader();
@@ -163,7 +163,7 @@ namespace _0713将文字保存成图片
                 byte[] mybyte = PhotoImageInsert(image, content,ft);
 
                 //MessageBox.Show(content + "\n" + ft + "\n" + mybyte);
-                string sqlCommandText1 = "insert into MySchool.dbo.Images(id,words,words_image,fonts) values (@id,@words,@words_image,@fonts)";
+                string sqlCommandText1 = "insert into tmLogo_wn.dbo.Chinese_words_Img(id,words,words_image,fonts) values (@id,@words,@words_image,@fonts)";
                 SqlParameter[] cmdParms1 =
                 {
                         new SqlParameter("@id",++temp1),
@@ -340,14 +340,14 @@ namespace _0713将文字保存成图片
             string ft = "";
             string content = "";
             byte[] MyData = new byte[0];
-            string sqlconnstr = "server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=MySchool";
+            string sqlconnstr = "server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=tmLogo_wn";
             using (SqlConnection conn = new SqlConnection(sqlconnstr))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = conn;
                 //cmd.CommandText = "select * from T_img";
-                cmd.CommandText = "SELECT * FROM Images where 1 = 1";
+                cmd.CommandText = "SELECT * FROM Chinese_words_Img where 1 = 1";
                 SqlDataReader sdr = cmd.ExecuteReader();
                 while(sdr.Read())
                 {

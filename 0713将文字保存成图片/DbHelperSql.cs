@@ -18,7 +18,7 @@ namespace _0713将文字保存成图片
 
         //protected static string connectionString = Form1.connStr;
         //protected static string connectionString = "server=(local);database=new_TempWork;uid=sa;pwd=wangning1995";
-        public static string connectionString = "server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=MySchool";
+        public static string connectionString = "server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=tmLogo_wn";
 
         //public DbHelperSQL()
         //{
