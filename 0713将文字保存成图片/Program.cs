@@ -38,8 +38,10 @@ namespace _0713将文字保存成图片
             //cmd.CommandText = "SELECT distinct un_simplified FROM Chinese_Img where id=22";
             //cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id >= 3535 and id <= 3540";//希腊字母
             //cmd.CommandText = "SELECT distinct words FROM Chinese_words_new";//中文
-            cmd.CommandText = "SELECT distinct eng_word FROM EngWord where id<=5";//英文
-            
+            //cmd.CommandText = "SELECT distinct eng_word FROM EngWord where id<=5";//英文
+            //cmd.CommandText = "SELECT distinct eng_word FROM EngWord where id=282104";//id'
+            cmd.CommandText = "SELECT distinct eng_word FROM EngWord_new";
+
             //cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id =103220";//【横眉冷对千夫指  俯首甘为孺子牛】
             //从数据库中读取数据流存入reader中
             SqlDataReader reader = cmd.ExecuteReader();
@@ -66,8 +68,8 @@ namespace _0713将文字保存成图片
                     //    //MessageBox.Show(un.Length.ToString());
                     //}
 
-                    ct.CreateImage(un, ft);  //生成图片
-                    //ct.saveToSQL(un, ft, ct.CreateImage(un, ft));  //将image图片存入数据库
+                    //ct.CreateImage(un, ft);  //生成图片
+                    ct.saveToSQL(un, ft, ct.CreateImage(un, ft));  //将image图片存入数据库
                     temp2++;
                     Console.WriteLine("{0}\t保存【{1}】成功！", temp2,un);
                     //Console.WriteLine("保存{0}成功！", un);
@@ -168,12 +170,12 @@ namespace _0713将文字保存成图片
                 byte[] mybyte = PhotoImageInsert(image, content,ft);
 
                 //MessageBox.Show(content + "\n" + ft + "\n" + mybyte);
-                string sqlCommandText1 = "insert into tmLogo_wn.dbo.Chinese_words_Img(id,words,words_image,fonts) values (@id,@words,@words_image,@fonts)";
+                string sqlCommandText1 = "insert into tmLogo_wn.dbo.EngWord_Img(id,eng_word,eng_word_image,fonts) values (@id,@eng_word,@eng_word_image,@fonts)";
                 SqlParameter[] cmdParms1 =
                 {
                         new SqlParameter("@id",++temp1),
-                        new SqlParameter("@words",content),
-                        new SqlParameter("@words_image",mybyte),
+                        new SqlParameter("@eng_word",content),
+                        new SqlParameter("@eng_word_image",mybyte),
                         new SqlParameter("@fonts",ft)
                 };
                 sum_a = sum_a + DbHelperSQL.ExecuteSql(sqlCommandText1, cmdParms1);
@@ -202,7 +204,7 @@ namespace _0713将文字保存成图片
             //string ch = ToGB2312(content);
             string ch = content;
             //对字符串内容长度进行判断
-            Console.WriteLine("字符串内容长度为：{0}", content.Length);
+            //Console.WriteLine("字符串内容长度为：{0}", content.Length);
             int len = content.Length;
             //创建一个位图对象
             //Bitmap image = new Bitmap(100 * len, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);//(int)Math.Ceiling((content.Length * 550.0))
