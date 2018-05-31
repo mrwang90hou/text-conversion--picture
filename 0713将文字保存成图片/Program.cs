@@ -16,11 +16,10 @@ namespace _0713将文字保存成图片
         public static int temp1 = 0;
         public static int temp2 = 0;
         public static int temp3 = 0;
-        public static string buildPicturePath = @"H:\国方软件\中英字词转图片\图片数据测试文件\生成图片\";
-        public static string loadPicturePath = @"H:\国方软件\中英字词转图片\图片数据测试文件\导出图片\";
-
-
-
+        //public static string buildPicturePath = @"H:\国方软件\中英字词转图片\图片数据测试文件\生成图片\";
+        //public static string loadPicturePath = @"H:\国方软件\中英字词转图片\图片数据测试文件\导出图片\";
+        public static string buildPicturePath = @"H:\国方软件\中英字词转图片\图片数据测试文件\英文\生成图片\";
+        public static string loadPicturePath = @"H:\国方软件\中英字词转图片\图片数据测试文件\英文\导出图片\";
         static void Main(string[] args)
         {
             //Form1 f1 = new Form1();
@@ -28,7 +27,8 @@ namespace _0713将文字保存成图片
             Program ct = new Program();
 
             string ft = "";
-            string connectionString = "server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=index_trademark_wn";//server处可以为localhost（本机的MySQL），//可以为云主机，那么等于号后为ip.Database为你的数据库名称
+            string connectionString = "server=MRWANG90HOU;Uid=sa;password=qwe123!@#;Database=index_trademark_wn";
+            //server处可以为localhost（本机的MySQL），//可以为云主机，那么等于号后为ip.Database为你的数据库名称
             //SqlConnection conn = new SqlConnection("Data Source=(192.168.0.232);Initial Catalog=index_trademark;Integrated Security=SSPI;");
             SqlConnection conn = new SqlConnection(connectionString);
             conn.Open();//打开数据库  
@@ -37,7 +37,9 @@ namespace _0713将文字保存成图片
             //创建查询语句
             //cmd.CommandText = "SELECT distinct un_simplified FROM Chinese_Img where id=22";
             //cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id >= 3535 and id <= 3540";//希腊字母
-            cmd.CommandText = "SELECT distinct words FROM Chinese_words_new";//希腊字母
+            //cmd.CommandText = "SELECT distinct words FROM Chinese_words_new";//中文
+            cmd.CommandText = "SELECT distinct eng_word FROM EngWord where id<=5";//英文
+            
             //cmd.CommandText = "SELECT distinct words FROM Chinese_words_new where id =103220";//【横眉冷对千夫指  俯首甘为孺子牛】
             //从数据库中读取数据流存入reader中
             SqlDataReader reader = cmd.ExecuteReader();
@@ -46,13 +48,16 @@ namespace _0713将文字保存成图片
             while (reader.Read())
             {
                 //string un = reader.GetString(reader.GetOrdinal("un_simplified")).Trim();
-                string un = reader.GetString(reader.GetOrdinal("words")).Trim();
+                string un = reader.GetString(reader.GetOrdinal("eng_word")).Trim();
                 for (int i = 1; i <= 2; i++)
                 {
                     switch (i)
                     {
                         case 1: ft = "黑体"; break;
                         case 2: ft = "宋体"; break;
+                        //case 3: ft = "楷体"; break;
+                        //case 4: ft = "仿宋"; break;
+
                     }
                     //增加对词典库中内容的判断：（1）文字个数（2）是否含有特殊字符
                     //if (un.Length <= 4)
@@ -61,8 +66,8 @@ namespace _0713将文字保存成图片
                     //    //MessageBox.Show(un.Length.ToString());
                     //}
 
-                    //ct.CreateImage(un, ft);  //生成图片
-                    ct.saveToSQL(un, ft, ct.CreateImage(un, ft));  //将image图片存入数据库
+                    ct.CreateImage(un, ft);  //生成图片
+                    //ct.saveToSQL(un, ft, ct.CreateImage(un, ft));  //将image图片存入数据库
                     temp2++;
                     Console.WriteLine("{0}\t保存【{1}】成功！", temp2,un);
                     //Console.WriteLine("保存{0}成功！", un);
@@ -71,7 +76,7 @@ namespace _0713将文字保存成图片
             conn.Close();
             Console.WriteLine("存库执行完毕！\n共计存储图片:{0}", temp2);
             //
-            ct.printPictureFromSQL();
+            //ct.printPictureFromSQL();
             Console.WriteLine("导出图片执行完毕！\n共计导出图片:{0}", temp3);
         }
         
@@ -196,15 +201,12 @@ namespace _0713将文字保存成图片
             }
             //string ch = ToGB2312(content);
             string ch = content;
-
             //对字符串内容长度进行判断
-            //Console.WriteLine("字符串内容长度为：{0}", content.Length);
-
+            Console.WriteLine("字符串内容长度为：{0}", content.Length);
             int len = content.Length;
-
-
             //创建一个位图对象
-            Bitmap image = new Bitmap(100 * len, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);//(int)Math.Ceiling((content.Length * 550.0))
+            //Bitmap image = new Bitmap(100 * len, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);//(int)Math.Ceiling((content.Length * 550.0))
+            Bitmap image = new Bitmap(50 * len, 100, System.Drawing.Imaging.PixelFormat.Format32bppArgb);//(int)Math.Ceiling((content.Length * 550.0))
 
             //设置dpi
             //image.SetResolution(300,300);
